@@ -73,4 +73,4 @@ Release:
        apiEndpoint: 'https://api.cf.sap.hana.ondemand.com'
        appName: 'myAppName'
        manifest: 'manifest.yml'
-       credentialsId: ''
+       credentialsId: 'global'
