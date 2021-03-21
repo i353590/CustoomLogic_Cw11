@@ -1,9 +1,76 @@
+###
+# This file configures the project "Piper" pipeline of your project.
+# For a reference of the configuration concept and available options, please have a look into its documentation.
+#
+# The documentation for the most recent pipeline version can always be found at:
+#    https://sap.github.io/jenkins-library/
+#
+# This is a YAML-file. YAML is an indentation-sensitive file format. Please make sure to properly indent changes to it.
+###
+
+
+
+### General project setup
+general:
+  inferBuildTool: true
+  unsafeMode: false
+  projectName: 'cloud-cap-s4ems-bp'
+  productiveBranch: 'master'
+
+### Step-specific configuration
 steps:
-  mtaBuild:
-    buildTarget: 'CF'
+  mavenExecute:
+    dockerImage: devxci/mbtci:1.0.14
+    artifactPrepareVersion:
+    buildTool: 'mta'
+  npmExecute:
+    dockerImage: 'ppiper/node-browsers:v2'
   cloudFoundryDeploy:
-    cloudFoundry:
-      credentialsId: 'pusercf'
-      apiEndpoint: 'https://api.cf.eu10.hana.ondemand.com'
-      org: 'referenceappscf'
-      space: 'CICD_s4ext'
+    dockerImage: 'ppiper/cf-cli'
+    mtaDeployParameters: '-f --version-rule ALL'
+  mtaBuild:
+    mtaBuildTool: "cloudMbt"
+
+  artifactPrepareVersion:
+    versioningType: cloud_noTag
+
+### Stage-specific configuration
+stages:
+  'Confirm':
+    manualConfirmation: false
+    npmAudit:
+    auditedAdvisories:
+    # high
+      - 550  
+      - 593
+      - 1184
+      - 755
+      - 1065
+      - 1164
+      - 1316
+      - 1324
+      - 1325
+    # moderate
+      - 535
+      - 1300
+ 
+  lint:
+    ui5BestPractices:
+      failThreshold:
+        error: 100
+        warning: 500
+        info: 1000
+
+#  Integration:
+#    credentials:
+#      - alias: 'mySystemAlias'
+#        credentialId: 'mySystemCredentialsId'
+
+Release:
+   cfTargets:
+     - org: 'myrefapps'
+       space: 'lalith'
+       apiEndpoint: 'https://api.cf.sap.hana.ondemand.com'
+       appName: 'myAppName'
+       manifest: 'manifest.yml'
+       credentialsId: ''
